@@ -125,6 +125,89 @@ function SearchPosts() {
    <Context.Provider value={{ state, dispatch }}>
    ```
 
+### Practical Example: PostProvider Component
+
+Here's a complete example of how we implemented Context API in our blog using a separate PostProvider component:
+
+```jsx
+// PostProvider.js
+const PostContext = createContext();
+
+export function PostProvider({ children }) {
+  const [posts, setPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Derived state
+  const searchedPosts =
+    searchQuery.length > 0
+      ? posts.filter((post) =>
+          `${post.title} ${post.body}`
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+        )
+      : posts;
+
+  const value = {
+    posts: searchedPosts,
+    onAddPost: (post) => setPosts((posts) => [post, ...posts]),
+    onClearPosts: () => setPosts([]),
+    searchQuery,
+    setSearchQuery,
+  };
+
+  return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
+}
+
+// Custom hook for consuming the context
+export function usePosts() {
+  const context = useContext(PostContext);
+  if (context === undefined)
+    throw new Error("usePosts must be used within a PostProvider");
+  return context;
+}
+```
+
+Using the Provider:
+
+```jsx
+// App.js
+function App() {
+  return (
+    <PostProvider>
+      <Header />
+      <Main />
+      <Footer />
+    </PostProvider>
+  );
+}
+```
+
+Consuming the context:
+
+```jsx
+// Any child component
+function SearchPosts() {
+  const { searchQuery, setSearchQuery } = usePosts();
+  return (
+    <input
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      placeholder="Search posts..."
+    />
+  );
+}
+```
+
+Key benefits of this implementation:
+
+1. **Separation of Concerns**: All post-related state management is isolated in PostProvider
+2. **Custom Hook**: `usePosts` provides type-safe context consumption with error checking
+3. **Derived State**: Search functionality is handled within the context
+4. **Clean Component Tree**: No prop drilling needed for post-related data
+5. **Reusability**: PostProvider can be used in any part of the application
+
+This pattern demonstrates how to properly structure context in a React application while maintaining clean and maintainable code.
+
 ### Context vs Props
 
 - **Props**: For component-specific data
