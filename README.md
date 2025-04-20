@@ -221,3 +221,15 @@ This pattern demonstrates how to properly structure context in a React applicati
 3. Use context selectors
 4. Implement error boundaries
 5. Consider performance implications
+
+# Types of state
+
+![alt text](types-of-state.png)
+
+## State placement
+
+![alt text](state-placement.png)
+
+### State placement tools
+
+![alt text](state-placement-tools.png)
